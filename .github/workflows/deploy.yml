@@ -1,0 +1,5 @@
+name: Deploy Glue Job via CDK
+on:
+  push:
+    branches:
+      - main
