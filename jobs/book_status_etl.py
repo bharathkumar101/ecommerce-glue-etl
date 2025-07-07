@@ -18,7 +18,7 @@ raw_dyf = glueContext.create_dynamic_frame.from_catalog(
     table_name="books"
 )
 raw_df = raw_dyf.toDF().withColumn("ingested_at", current_timestamp())
-print("test")
+print("test1")
 # Read existing status table
 try:
     existing_dyf = glueContext.create_dynamic_frame.from_catalog(
