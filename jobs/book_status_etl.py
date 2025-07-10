@@ -93,7 +93,8 @@ comparison_df = joined_df.withColumn("book_id", coalesce("new_book_id", "old_boo
         )).otherwise(lit(""))
     ) \
     .withColumn("flag", col("is_new") | col("is_updated")) \
-    .withColumn("last_updated", when(col("flag"), current_timestamp()).otherwise(col("last_updated")))
+    .withColumn("last_updated", when(col("flag"), col("new_ingested_at")).otherwise(col("last_updated")))
+
 
 # Final cleaned output
 final_df = comparison_df.select(
@@ -105,8 +106,12 @@ final_df = comparison_df.select(
     coalesce("new_stock", "old_stock").alias("stock"),
     "flag",
     "message",
-    "last_updated"
+    when(col("flag"), col("new_ingested_at")).otherwise(col("last_updated")).alias("last_updated"),
+    col("new_ingested_at").alias("ingested_at")
 )
+
+# Optional: only write new/updated records to save cost
+final_df_filtered = final_df.filter(col("flag") == True)
 
 # Write back to Glue table
 final_dyf = DynamicFrame.fromDF(final_df, glueContext, "final_dyf")
